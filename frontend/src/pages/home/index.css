@@ -1,0 +1,40 @@
+.main-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 90vh;
+  width: 90vw;
+  font-size: 20px;
+}
+
+.orders-table {
+  width: 90%;
+  margin: 5% auto 0;
+  min-width: 600px;
+  border-collapse: collapse;
+}
+
+.orders-table th,
+.orders-table td {
+  border: 1px solid #ccc;
+  padding: 8px;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.orders-table th {
+  background-color: #1a1a1a;
+  text-align: center;
+}
+
+.table-wrapper {
+  width: 100%;
+}
+
+.items-table {
+  border-collapse: collapse;
+}
+
+.input-field {
+  width: 100%;
+}
