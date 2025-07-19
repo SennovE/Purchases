@@ -7,5 +7,6 @@ export default defineConfig({
   server: {
     host: process.env.VITE_HOST || 'localhost',
     port: Number(process.env.VITE_PORT) || 3000,
+    allowedHosts: ['purchases.ddns.net'],
   },
 })

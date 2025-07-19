@@ -1,13 +1,15 @@
-import { useState } from 'react';
+import { useMemo, useState, type Dispatch, type SetStateAction } from 'react';
 import CreatableSelect from 'react-select/creatable';
 import { patchObject } from '../../functions';
+import type { OrderChoices } from '../../models';
 
 interface Props {
   id: string;
-  field: string;
-  field_value: string | null;
-  patch_url: string;
-  list: string[];
+  field: keyof OrderChoices;
+  fieldValue: string | null;
+  patchUrl: string;
+  list: OrderChoices;
+  listSetter: Dispatch<SetStateAction<OrderChoices>>;
 }
 
 type OptionType = { value: string; label: string };
@@ -20,11 +22,14 @@ const customStyles = {
   }),
   input: (base: any) => ({
     ...base,
-    color: '#ffffff',
+    color: '#000',
   }),
   singleValue: (base: any) => ({
     ...base,
-    color: '#ffffff',
+    color: '#000',
+    fontSize: '1em', 
+    fontWeight: 500,
+    fontFamily: 'inherit'
   }),
   valueContainer: (base: any) => ({
     ...base,
@@ -35,29 +40,43 @@ const customStyles = {
   }),
   placeholder: (base: any) => ({
     ...base,
-    color: '#999',
+    color: '#444',
     fontStyle: 'italic',
   }),
-   menu: (base: any) => ({
+  menu: (base: any) => ({
     ...base,
     backgroundColor: '#242424',
-  }),
+  })
 };
 
-export function DropoutListInput({ id, field, field_value, patch_url, list }: Props) {
-  const initialOptions = list.map(item => ({ value: item, label: item }));
-  const [options, setOptions] = useState<OptionType[]>(initialOptions);
+export function DropoutListInput({ id, field, fieldValue, patchUrl, list, listSetter }: Props) {
+  const options = useMemo<OptionType[]>(() =>
+    list[field].map(
+      v => ({ value: v, label: v })
+    ), [list, field]
+  );
   const [value, setValue] = useState<OptionType | null>(
-    field_value ? { value: field_value, label: field_value } : null
+    fieldValue ? { value: fieldValue, label: fieldValue } : null
   );
   const [inputValue, setInputValue] = useState('');
 
-  const updateField = async (opt: OptionType) => {
-    const ok = await patchObject(id, field, opt.value, patch_url);
+  const applyValue = async (opt: OptionType) => {
+    const ok = await patchObject<string>(id, field, opt.value, patchUrl);
     if (ok) {
       setValue(opt);
-      setInputValue(''); 
+      setInputValue('');
     }
+  };
+
+  const addToChoices = (label: string): OptionType => {
+    listSetter(prev => {
+      if (prev[field].includes(label)) return prev;
+      return {
+        ...prev,
+        [field]: [...prev[field], label]
+      };
+    });
+    return { value: label, label };
   };
 
   return (
@@ -65,34 +84,27 @@ export function DropoutListInput({ id, field, field_value, patch_url, list }: Pr
       styles={customStyles}
       options={options}
       value={value}
-
       inputValue={inputValue}
       onInputChange={(newInput) => setInputValue(newInput)}
       onFocus={() => {
-        if (value) {
-          setInputValue(value.label);
-        }
+        if (value) setInputValue(value.label);
       }}
-
       // onBlur={() => {}}
-
       onChange={(opt) => {
-        if (opt) {
-          void updateField(opt);
-        }
+        if (opt) void applyValue(opt);
       }}
       onCreateOption={(label) => {
-        const newOpt = { value: label, label };
-        setOptions(prev => [...prev, newOpt]);
-        void updateField(newOpt);
+        const opt = addToChoices(label);
+        void applyValue(opt);
       }}
-
       placeholder="Выберите или добавьте…"
       isClearable={false}
       components={{
         DropdownIndicator: () => null,
-        IndicatorSeparator: () => null,
+        IndicatorSeparator: () => null
       }}
+      menuPortalTarget={typeof document !== 'undefined' ? document.body : null}
+      menuPosition="fixed"
     />
   );
 }

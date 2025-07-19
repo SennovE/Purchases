@@ -1,85 +1,113 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type Dispatch, type SetStateAction } from 'react';
 import { addObject, deleteObject, getObject, getOrderChoices } from '../functions';
-import type { OrderChoices, OrderResponse } from '../models';
+import type { OrderChoices, OrderInfo } from '../models';
 import { DropoutListInput } from './common/dropout-list';
+import { AutoPatchInput } from './common/auto-patch-input';
 
-export function OrdersTable() {
+interface Props {
+  setOrderIdForItems: Dispatch<SetStateAction<string | null>>;
+}
+
+export function OrdersTable({ setOrderIdForItems }: Props) {
   const [choices, setChoices] = useState<OrderChoices | null>(null);
-  const [orders, setOrders] = useState<OrderResponse[] | null>(null);
+  const [orders, setOrders] = useState<OrderInfo[] | null>(null);
   const [loading, setLoading] = useState(true);
-  const order_fields: (keyof OrderChoices)[] = ['initiator', 'by_order', 'by_bank', 'source', 'country', 'address']
-
+  const orderFields: (keyof OrderChoices)[] = [
+    'initiator', 'by_order', 'by_bank', 'country', 'address', 'source'
+  ]
   
-  const fetchChoices = async () => {
-    const choices_data = await getOrderChoices();
-    const orders_data = await getObject<OrderResponse[]>('order');
-    setChoices(choices_data);
-    setOrders(orders_data);
+  const fetchData = async () => {
+    const choicesData = await getOrderChoices();
+    const ordersData = await getObject<OrderInfo[]>('order');
+    setChoices(choicesData);
+    setOrders(ordersData);
     setLoading(false);
   }
 
   useEffect(() => {
-    fetchChoices();
+    fetchData();
   }, []);
 
   if (loading) return <h1>Загрузка...</h1>;
   if (!choices || !orders) return <h1>Произошла ошибка во время загрузки</h1>;
 
   return (
-    <>
-      <table className='orders-table'>
+    <div style={{ textAlign: 'center' }}>
+      <h1>Заказы</h1>
+      <table>
         <thead>
           <tr>
-            <div></div>
+            <th style={{ border: 0, background: 'transparent' }}></th>
             <th colSpan={2}></th>
             <th colSpan={2}>Продавец</th>
-            <th>Оплата</th>
             <th colSpan={2}>Получение</th>
+            <th colSpan={3}>Оплата</th>
           </tr>
-          <tr>
-            <td style={{ textAlign: 'center' }}>
+          <tr className='bottom-header'>
+            <th style={{ textAlign: 'center' }}>
               <button onClick={async () => {
                 await addObject('order');
-                setOrders(await getObject<OrderResponse[]>('order'));
-              }}><b>+</b></button>
-            </td>
+                setOrders(await getObject<OrderInfo[]>('order'));
+              }}><b style={{ fontSize: 20 }}>+</b></button>
+            </th>
             <th>Дата<br/>авторизации</th>
             <th>Инициатор<br/>покупки</th>
             <th>По заказу</th>
             <th>По выписке<br/>банка</th>
-            <th>Источник</th>
             <th>Страна</th>
             <th>Адрес</th>
+            <th>Источник</th>
+            <th>Сумма, &euro;</th>
+            <th>Check</th>
             <th>Товары</th>
           </tr>
         </thead>
         <tbody>
-          {orders.map(order_info => (
-            <tr key={order_info.order.id}>
+          {orders.map(orderInfo => (
+            <tr key={orderInfo.id}>
               <td style={{ textAlign: 'center' }}>
                 <button type='button' onClick={
                   async () => {
-                    await deleteObject(order_info.order.id, 'order');
-                    setOrders(await getObject<OrderResponse[]>('order'));
+                    await deleteObject(orderInfo.id, 'order');
+                    setOrders(await getObject<OrderInfo[]>('order'));
                   }
                 }>
                   &#128465;
                 </button>
               </td>
-              <td><input type='date'></input></td>
-              {order_fields.map(field_name => (
-                <td key={field_name}>
+              <td>
+                <AutoPatchInput
+                  object={orderInfo}
+                  setObjects={setOrders}
+                  field={'date'} 
+                  fieldType={'date'}
+                  url={'order'}
+                />
+              </td>
+              {orderFields.map(fieldName => (
+                <td key={fieldName}>
                   <DropoutListInput
-                    id={order_info.order.id}
-                    field={field_name}
-                    field_value={order_info.order[field_name]}
-                    patch_url='order'
-                    list={choices[field_name]}
+                    id={orderInfo.id}
+                    field={fieldName}
+                    fieldValue={orderInfo[fieldName]}
+                    patchUrl='order'
+                    list={choices}
+                    listSetter={setChoices}
                   />
                 </td>
               ))}
+              <td>
+                <AutoPatchInput
+                  object={orderInfo}
+                  setObjects={setOrders}
+                  field={'paid'} 
+                  fieldType={'number'}
+                  url={'order'}
+                />
+              </td>
+              <td></td>
               <td style={{ textAlign: 'center' }}>
-                <button type='button' onClick={() => {}}>
+                <button type='button' onClick={() => setOrderIdForItems(orderInfo.id)}>
                   { '>>' }
                 </button>
               </td>
@@ -87,6 +115,6 @@ export function OrdersTable() {
           ))}
         </tbody>
       </table>
-    </>
+    </div>
   );
 }

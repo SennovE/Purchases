@@ -1,4 +1,5 @@
 export interface OrderInfo {
+  id: string;
   date: string | null;
   initiator: string | null;
   by_order: string | null;
@@ -6,23 +7,17 @@ export interface OrderInfo {
   source: string | null;
   country: string | null;
   address: string | null;
-  id: string;
+  paid: number | null;
 }
 
-export interface Item {
-  id: string | null;
+export interface ItemInfo {
+  id: string;
   name: string | null;
   count: number | null;
   price_by_one: number | null;
-  check: boolean | null;
   return_count: number | null;
   return_check: boolean | null;
   return_date: string | null;
-}
-
-export interface OrderResponse {
-  order: OrderInfo;
-  items: Item[];
 }
 
 export interface OrderChoices {

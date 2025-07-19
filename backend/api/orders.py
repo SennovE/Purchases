@@ -2,10 +2,10 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, status
 
-from api.models.orders import OrderChoices, OrderPatch, OrderWithItems
+from api.models.orders import OrderChoices, OrderPatch, OrderRespose
 from database.models import Orders
 from database.utils.crud import CRUDManager
-from database.utils.orders import select_orders_with_items, select_unique_values
+from database.utils.orders import select_unique_values
 from utils.jwt import check_token
 
 router = APIRouter(
@@ -30,8 +30,8 @@ async def remove_order(id: UUID) -> None:
 
 
 @router.get("", status_code=status.HTTP_200_OK)
-async def get_orders() -> list[OrderWithItems]:
-    return await select_orders_with_items()
+async def get_orders() -> list[OrderRespose]:
+    return await orders_crud_manager.select_all()
 
 
 @router.get("/choices", status_code=status.HTTP_200_OK)

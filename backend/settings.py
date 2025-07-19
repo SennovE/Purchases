@@ -11,11 +11,6 @@ class PostgresSettings(BaseModel):
 
     @computed_field
     @property
-    def sync_url(self) -> str:
-        return f"postgresql://{self.user}:{self.password}@{self.host}:{self.port}/{self.db}"
-
-    @computed_field
-    @property
     def async_url(self) -> str:
         return f"postgresql+asyncpg://{self.user}:{self.password}@{self.host}:{self.port}/{self.db}"
 

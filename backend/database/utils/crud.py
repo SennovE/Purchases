@@ -1,13 +1,15 @@
+from typing import Type
 from uuid import UUID
 
 from pydantic import BaseModel
 from sqlalchemy import delete, insert, select, update
 
+from database import Model
 from database.connection import db
 
 
 class CRUDManager:
-    def __init__(self, model):
+    def __init__(self, model: Type[Model]):
         self.model = model
 
     async def insert(self, item: BaseModel) -> None:
@@ -34,5 +36,5 @@ class CRUDManager:
 
     async def select_all(self) -> list:
         async with db.get_session() as session:
-            query = select(self.model)
+            query = select(self.model).order_by(self.model.created_dt)
             return await session.scalars(query)

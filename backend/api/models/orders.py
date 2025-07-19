@@ -12,13 +12,13 @@ class OrderPatch(BaseModel):
     source: str | None = None
     country: str | None = None
     address: str | None = None
+    paid: float | None = None
 
 
 class ItemPatch(BaseModel):
     name: str | None = None
     count: int | None = None
     price_by_one: float | None = None
-    check: bool | None = None
     return_count: int | None = None
     return_check: bool | None = None
     return_date: datetime.date | None = None
@@ -36,13 +36,6 @@ class OrderRespose(OrderPatch):
 
 class ItemRespose(ItemPatch):
     id: UUID
-
-    model_config = ConfigDict(from_attributes=True)
-
-
-class OrderWithItems(BaseModel):
-    order: OrderRespose
-    items: list[ItemRespose]
 
     model_config = ConfigDict(from_attributes=True)
 

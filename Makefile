@@ -9,7 +9,12 @@ check:
 	cd $(BACKEND_FOLDER) && uv run mypy .
 
 run:
-	docker compose up --build --watch
+	docker compose up postgres backend frontend --build --watch
 
 deploy:
-	docker compose up --build -d
+	docker compose up postgres backend frontend nginx renew --build -d
+
+get-certs:
+	docker compose run --rm certbot certonly --noninteractive --agree-tos \
+		--webroot -w /var/www/certbot \
+		-d purchases.ddns.net

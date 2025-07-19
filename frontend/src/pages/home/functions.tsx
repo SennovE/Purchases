@@ -1,15 +1,22 @@
 import axios, { type AxiosResponse } from 'axios';
 import type { OrderChoices } from './models';
 
+const baseURL = `${import.meta.env.VITE_APP_BACKEND_URL}/api`;
+
+const api = axios.create({ baseURL });
+
+api.interceptors.request.use(config => {
+  const token = localStorage.getItem('purchasesToken');
+  if (token) {
+    config.headers = config.headers ?? {};
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
 
 export async function getOrderChoices(): Promise<OrderChoices | null> {
-  const token = localStorage.getItem('purchasesToken');
-  if (!token) return null;
   try {
-    const result: AxiosResponse<OrderChoices> = await axios.get(
-      `${import.meta.env.VITE_APP_BACKEND_URL}/api/order/choices`,
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
+    const result: AxiosResponse<OrderChoices> = await api.get(`/order/choices`);
     return result.data;
   } catch (err) {
     console.error(err);
@@ -18,27 +25,18 @@ export async function getOrderChoices(): Promise<OrderChoices | null> {
 }
 
 export async function deleteObject(id: string, url: string) {
-  const token = localStorage.getItem('purchasesToken');
-  if (!token) return;
   try {
-    await axios.delete(
-      `${import.meta.env.VITE_APP_BACKEND_URL}/api/${url}/${id}`,
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
+    await api.delete(`/${url}/${id}`);
   } catch (err) {
     console.error(err);
   }
 }
 
-export async function patchObject<T>(id: string, field: string, value: T, url: string): Promise<Boolean> {
-  const token = localStorage.getItem('purchasesToken');
-  if (!token) return false;
+export async function patchObject<T>(
+  id: string, field: string, value: T, url: string
+): Promise<Boolean> {
   try {
-    await axios.patch(
-      `${import.meta.env.VITE_APP_BACKEND_URL}/api/${url}/${id}`,
-      { [field]: value },
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
+    await api.patch(`/${url}/${id}`, { [field]: value });
     return true;
   } catch (err) {
     console.error(err);
@@ -47,14 +45,8 @@ export async function patchObject<T>(id: string, field: string, value: T, url: s
 }
 
 export async function addObject(url: string): Promise<Boolean> {
-  const token = localStorage.getItem('purchasesToken');
-  if (!token) return false;
   try {
-    await axios.post(
-      `${import.meta.env.VITE_APP_BACKEND_URL}/api/${url}`,
-      {},
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
+    await api.post(`/${url}`, {});
     return true;
   } catch (err) {
     console.error(err);
@@ -63,13 +55,8 @@ export async function addObject(url: string): Promise<Boolean> {
 }
 
 export async function getObject<T>(url: string): Promise<T | null> {
-  const token = localStorage.getItem('purchasesToken');
-  if (!token) return null;
   try {
-    const result: AxiosResponse<T> = await axios.get(
-      `${import.meta.env.VITE_APP_BACKEND_URL}/api/${url}`,
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
+    const result: AxiosResponse<T> = await api.get(`/${url}`);
     return result.data;
   } catch (err) {
     console.error(err);

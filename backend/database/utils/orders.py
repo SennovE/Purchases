@@ -1,22 +1,8 @@
 from sqlalchemy import select
-from sqlalchemy.orm import selectinload
 
-from api.models.orders import OrderChoices, OrderWithItems
+from api.models.orders import OrderChoices
 from database.connection import db
 from database.models import Orders
-
-
-async def select_orders_with_items() -> list[OrderWithItems]:
-    async with db.get_session() as session:
-        query = select(Orders).options(selectinload(Orders.items))
-        orders = await session.scalars(query)
-        return list(
-            OrderWithItems(
-                order=o,
-                items=o.items,
-            )
-            for o in orders
-        )
 
 
 async def select_unique_values() -> OrderChoices:
