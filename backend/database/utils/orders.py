@@ -1,24 +1,9 @@
-from sqlalchemy import insert, select
+from sqlalchemy import select
 from sqlalchemy.orm import selectinload
 
-from api.models.orders import OrderPost, OrderWithItems
+from api.models.orders import OrderChoices, OrderWithItems
 from database.connection import db
-from database.models import Items, Orders
-
-
-async def add_order_with_items(order_post: OrderPost) -> None:
-    async with db.get_session() as session:
-        order_query = (
-            insert(Orders).values(**order_post.order.model_dump()).returning(Orders.id)
-        )
-        result = await session.execute(order_query)
-        order_id = result.scalar_one()
-        items_data = [
-            {**item.model_dump(), "order_id": order_id} for item in order_post.items
-        ]
-        if items_data:
-            await session.execute(insert(Items), items_data)
-        await session.commit()
+from database.models import Orders
 
 
 async def select_orders_with_items() -> list[OrderWithItems]:
@@ -32,3 +17,13 @@ async def select_orders_with_items() -> list[OrderWithItems]:
             )
             for o in orders
         )
+
+
+async def select_unique_values() -> OrderChoices:
+    async with db.get_session() as session:
+        temp: dict[str, list] = {}
+        for column in Orders.__table__.columns:
+            if column.name in OrderChoices.model_fields:
+                query = select(column).where(column != None).distinct()  # noqa: E711
+                temp[column.name] = await session.scalars(query)
+        return OrderChoices(**temp)

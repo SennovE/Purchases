@@ -25,7 +25,7 @@ export function ItemsTable({ items, orderId, editing, setOrders }: Props) {
   const [newItem, setNewItem] = useState<ItemPost>(emptyNewItem);
 
   return (
-    <table className="items-table">
+    <table className='items-table'>
       <thead>
         <tr>
           {editing === 1 && <><th></th><th></th></>}

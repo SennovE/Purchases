@@ -24,7 +24,7 @@ class Orders(DBBaseModel):
         default=uuid4,
         unique=True,
     )
-    date = Column(Date, nullable=False)
+    date = Column(Date)
     initiator = Column(String)
     by_order = Column(String)
     by_bank = Column(String)
@@ -50,9 +50,9 @@ class Items(DBBaseModel):
         unique=True,
     )
     order_id = Column(UUID, ForeignKey("orders.id", ondelete="CASCADE"))
-    name = Column(String, nullable=False)
-    count = Column(Integer, nullable=False)
-    price_by_one = Column(Double, nullable=False)
+    name = Column(String)
+    count = Column(Integer)
+    price_by_one = Column(Double)
     check = Column(Boolean, default=False)
     return_count = Column(Integer)
     return_check = Column(Boolean, default=False)

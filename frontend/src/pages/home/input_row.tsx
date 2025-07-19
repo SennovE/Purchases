@@ -1,4 +1,4 @@
-import { useState, type Dispatch, type SetStateAction } from "react";
+import { useState, type Dispatch, type SetStateAction } from 'react';
 
 
 interface NewFieldsInputRowProps<T> {
@@ -33,7 +33,7 @@ export function NewFieldsInputRow<T>(
       field
       ? <input
         type={field[1]}
-        value={String(newFields[field[0]] ?? "")}
+        value={String(newFields[field[0]] ?? '')}
         checked={Boolean(newFields[field[0]])}
         style={{ borderColor: isAddingNewFields && !newFields[field[0]] ? 'red' : '' }}
         onChange={e =>

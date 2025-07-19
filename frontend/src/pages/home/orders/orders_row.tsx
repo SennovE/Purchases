@@ -1,9 +1,9 @@
-import { Fragment, useState, type Dispatch, type SetStateAction } from "react";
-import type { Item, OrderInfo, OrderPost, OrderResponse } from "../models";
-import { deleteOrder, patchOrder } from "../functions";
-import { ItemsTable } from "../items/items_table";
+import { Fragment, useState, type Dispatch, type SetStateAction } from 'react';
+import type { Item, OrderInfo, OrderPost, OrderResponse } from '../models';
+import { deleteOrder, patchOrder } from '../functions';
+import { ItemsTable } from '../items/items_table';
 import '../index.css';
-import { NewFieldsInputRow } from "../input_row";
+import { NewFieldsInputRow } from '../input_row';
 
 interface Props {
   order: OrderInfo;

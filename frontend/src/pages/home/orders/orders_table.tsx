@@ -42,10 +42,10 @@ export function OrdersTable({ orders, setOrders }: Props ) {
           <tr>
             {editing === 1 && <><th></th><th></th></>}
             <th></th>
-            <th>Дата авторизации</th>
-            <th>Инициатор покупки</th>
+            <th>Дата<br/>авторизации</th>
+            <th>Инициатор<br/>покупки</th>
             <th>По заказу</th>
-            <th>По выписке банка</th>
+            <th>По выписке<br/>банка</th>
             <th>Источник</th>
             <th>Страна</th>
             <th>Адрес</th>

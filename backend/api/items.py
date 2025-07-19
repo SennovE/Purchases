@@ -12,8 +12,8 @@ items_manager = CRUDManager(Items)
 
 
 @router.post("", status_code=status.HTTP_201_CREATED)
-async def create_item(item: ItemPost):
-    await items_manager.insert(item)
+async def create_item(order_id: UUID):
+    await items_manager.insert(ItemPost(order_id=order_id))
 
 
 @router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)

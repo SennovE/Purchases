@@ -4,17 +4,7 @@ from uuid import UUID
 from pydantic import BaseModel, ConfigDict
 
 
-class OrderBase(BaseModel):
-    date: datetime.date
-    initiator: str
-    by_order: str
-    by_bank: str
-    source: str
-    country: str
-    address: str
-
-
-class OrderPatch(OrderBase):
+class OrderPatch(BaseModel):
     date: datetime.date | None = None
     initiator: str | None = None
     by_order: str | None = None
@@ -24,39 +14,27 @@ class OrderPatch(OrderBase):
     address: str | None = None
 
 
-class ItemBase(BaseModel):
-    name: str
-    count: int
-    price_by_one: float
-    check: bool
+class ItemPatch(BaseModel):
+    name: str | None = None
+    count: int | None = None
+    price_by_one: float | None = None
+    check: bool | None = None
     return_count: int | None = None
     return_check: bool | None = None
     return_date: datetime.date | None = None
 
 
-class ItemPost(ItemBase):
+class ItemPost(ItemPatch):
     order_id: UUID
 
 
-class ItemPatch(ItemPost):
-    name: str | None = None
-    count: int | None = None
-    price_by_one: float | None = None
-    check: bool | None = None
-
-
-class OrderPost(BaseModel):
-    order: OrderBase
-    items: list[ItemBase]
-
-
-class OrderRespose(OrderBase):
+class OrderRespose(OrderPatch):
     id: UUID
 
     model_config = ConfigDict(from_attributes=True)
 
 
-class ItemRespose(ItemBase):
+class ItemRespose(ItemPatch):
     id: UUID
 
     model_config = ConfigDict(from_attributes=True)
@@ -67,3 +45,12 @@ class OrderWithItems(BaseModel):
     items: list[ItemRespose]
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class OrderChoices(BaseModel):
+    initiator: list[str] = []
+    by_order: list[str] = []
+    by_bank: list[str] = []
+    source: list[str] = []
+    country: list[str] = []
+    address: list[str] = []
