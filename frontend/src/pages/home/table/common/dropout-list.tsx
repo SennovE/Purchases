@@ -9,7 +9,7 @@ interface Props {
   fieldValue: string | null;
   patchUrl: string;
   list: OrderChoices;
-  listSetter: Dispatch<SetStateAction<OrderChoices>>;
+  listSetter: Dispatch<SetStateAction<OrderChoices | null>>;
 }
 
 type OptionType = { value: string; label: string };
@@ -70,7 +70,7 @@ export function DropoutListInput({ id, field, fieldValue, patchUrl, list, listSe
 
   const addToChoices = (label: string): OptionType => {
     listSetter(prev => {
-      if (prev[field].includes(label)) return prev;
+      if (!prev || prev[field].includes(label)) return prev;
       return {
         ...prev,
         [field]: [...prev[field], label]

@@ -28,5 +28,5 @@ async def remove_item(id: UUID):
 
 
 @router.get("/{id}", status_code=status.HTTP_200_OK)
-async def get_orders(id: UUID) -> list[ItemRespose]:
+async def get_items(id: UUID) -> list[ItemRespose]:
     return await select_items_by_order_id(id)

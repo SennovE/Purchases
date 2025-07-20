@@ -1,14 +1,15 @@
-import { useEffect, useState, type Dispatch, type SetStateAction } from 'react';
+import { useCallback, useEffect, useState, type Dispatch, type SetStateAction } from 'react';
 import { addObject, deleteObject, getObject, getOrderChoices } from '../functions';
 import type { OrderChoices, OrderInfo } from '../models';
 import { DropoutListInput } from './common/dropout-list';
 import { AutoPatchInput } from './common/auto-patch-input';
 
 interface Props {
+  orderIdForItems: string | null;
   setOrderIdForItems: Dispatch<SetStateAction<string | null>>;
 }
 
-export function OrdersTable({ setOrderIdForItems }: Props) {
+export function OrdersTable({ orderIdForItems, setOrderIdForItems }: Props) {
   const [choices, setChoices] = useState<OrderChoices | null>(null);
   const [orders, setOrders] = useState<OrderInfo[] | null>(null);
   const [loading, setLoading] = useState(true);
@@ -16,17 +17,29 @@ export function OrdersTable({ setOrderIdForItems }: Props) {
     'initiator', 'by_order', 'by_bank', 'country', 'address', 'source'
   ]
   
-  const fetchData = async () => {
-    const choicesData = await getOrderChoices();
-    const ordersData = await getObject<OrderInfo[]>('order');
-    setChoices(choicesData);
-    setOrders(ordersData);
-    setLoading(false);
-  }
+  const fetchData = useCallback(async () => {
+    setLoading(true);
+    try {
+      const [choicesData, ordersData] = await Promise.all([
+        getOrderChoices(),
+        getObject<OrderInfo[]>('order'),
+      ]);
+      setChoices(choicesData);
+      setOrders(ordersData);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [fetchData]);
+
+  useEffect(() => {
+    if (orderIdForItems === null) {
+      fetchData();
+    }
+  }, [orderIdForItems, fetchData]);
 
   if (loading) return <h1>Загрузка...</h1>;
   if (!choices || !orders) return <h1>Произошла ошибка во время загрузки</h1>;
@@ -105,7 +118,9 @@ export function OrdersTable({ setOrderIdForItems }: Props) {
                   url={'order'}
                 />
               </td>
-              <td></td>
+              <td className='computed-field'>
+                { orderInfo.total_amount === orderInfo.paid ? 'OK' : 'ERROR' }
+              </td>
               <td style={{ textAlign: 'center' }}>
                 <button type='button' onClick={() => setOrderIdForItems(orderInfo.id)}>
                   { '>>' }

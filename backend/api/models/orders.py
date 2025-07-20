@@ -30,6 +30,7 @@ class ItemPost(ItemPatch):
 
 class OrderRespose(OrderPatch):
     id: UUID
+    total_amount: float
 
     model_config = ConfigDict(from_attributes=True)
 

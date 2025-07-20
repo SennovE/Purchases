@@ -17,7 +17,10 @@ export default function MainPage() {
       <div className="tables-slider-wrapper">
         <div className={`tables-slider-track ${showItems ? 'items' : 'orders'}`}>
           <section className="tables-panel">
-            <OrdersTable setOrderIdForItems={setOrderIdForItems} />
+            <OrdersTable 
+              orderIdForItems={orderIdForItems}
+              setOrderIdForItems={setOrderIdForItems}
+            />
           </section>
           <section className="tables-panel">
             <ItemsTable

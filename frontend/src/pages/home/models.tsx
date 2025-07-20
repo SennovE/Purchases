@@ -8,6 +8,7 @@ export interface OrderInfo {
   country: string | null;
   address: string | null;
   paid: number | null;
+  total_amount: number | null;
 }
 
 export interface ItemInfo {
