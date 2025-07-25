@@ -9,7 +9,7 @@ check:
 	cd $(BACKEND_FOLDER) && uv run mypy .
 
 run:
-	docker compose up postgres backend frontend --build --watch
+	docker compose up postgres backend frontend_dev --build --watch
 
 deploy:
 	docker compose up postgres backend frontend nginx renew --build -d

@@ -2,6 +2,7 @@ volumes:
   certbot:
   webroot:
   database:
+  frontend_dist:
 
 services:
   postgres:
@@ -40,9 +41,11 @@ services:
       postgres:
         condition: service_healthy
 
-  frontend:
-    container_name: frontend
-    build: ./frontend
+  frontend_dev:
+    container_name: frontend_dev
+    build:
+      context: ./frontend
+      dockerfile: DockerfileDev
     env_file:
       - ./.env
     ports:
@@ -55,6 +58,17 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    env_file:
+      - ./.env
+    volumes:
+    - frontend_dist:/usr/share/nginx/html:ro
+    depends_on:
+      - backend
   
   nginx:
     image: nginx:stable-alpine
@@ -69,6 +83,7 @@ services:
       - ./nginx:/etc/nginx/conf.d:ro
       - certbot:/etc/letsencrypt:ro
       - webroot:/var/www/certbot:ro
+      - frontend_dist:/usr/share/nginx/html:ro
 
   certbot:
     image: certbot/certbot
