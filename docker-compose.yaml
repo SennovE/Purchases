@@ -2,6 +2,7 @@ volumes:
   certbot:
   webroot:
   database:
+  frontend_dist:
 
 services:
   postgres:
@@ -55,20 +56,22 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-  
+
   nginx:
-    image: nginx:stable-alpine
+    build:
+      context: .
+      dockerfile: nginx/Dockerfile
+    env_file:
+      - ./.env
     ports:
       - "80:80"
       - "443:443"
-    env_file:
-      - ./.env
-    depends_on:
-      - backend
     volumes:
-      - ./nginx:/etc/nginx/conf.d:ro
       - certbot:/etc/letsencrypt:ro
       - webroot:/var/www/certbot:ro
+    depends_on:
+      - backend
+
 
   certbot:
     image: certbot/certbot
