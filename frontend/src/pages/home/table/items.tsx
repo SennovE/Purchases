@@ -59,7 +59,7 @@ export function ItemsTable({
               <button onClick={async () => {
                 await addObject(`item/${orderIdForItems}`);
                 setItems(await getObject<ItemInfo[]>(`item/${orderIdForItems}`));
-              }}><b style={{ fontSize: 20 }}>+</b></button>
+              }}><b style={{ fontSize: '1vw' }}>+</b></button>
             </th>
             <th>Наименование</th>
             <th>Количество</th>

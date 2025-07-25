@@ -69,7 +69,7 @@ export function OrdersTable({
               <button onClick={async () => {
                 await addObject('order');
                 setOrders(await getObject<OrderInfo[]>('order'));
-              }}><b style={{ fontSize: 20 }}>+</b></button>
+              }}><b style={{ fontSize: '1vw' }}>+</b></button>
             </th>
             <th>Дата<br/>авторизации</th>
             <th>Инициатор<br/>покупки</th>

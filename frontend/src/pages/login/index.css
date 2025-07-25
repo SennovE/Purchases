@@ -24,3 +24,8 @@
 .login-error:empty {
   visibility: hidden;
 }
+
+.login-page button,
+.login-page input {
+  font-size: medium;
+}

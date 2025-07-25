@@ -29,10 +29,11 @@ const customStyles = {
     color: '#000',
     fontSize: '1em', 
     fontWeight: 500,
-    fontFamily: 'inherit'
+    fontFamily: 'inherit',
   }),
   valueContainer: (base: any) => ({
     ...base,
+    padding: 0,
   }),
   option: (base: any, state: any) => ({
     ...base,
