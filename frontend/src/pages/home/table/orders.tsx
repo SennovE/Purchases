@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState, type Dispatch, type SetStateAction } from 'react';
-import { addObject, deleteObject, getObject, getOrderChoices } from '../functions';
+import { addObject, getObject, getOrderChoices } from '../functions';
 import type { OrderChoices, OrderInfo } from '../models';
 import { DropoutListInput } from './common/dropout-list';
 import { AutoPatchInput } from './common/auto-patch-input';
@@ -7,9 +7,13 @@ import { AutoPatchInput } from './common/auto-patch-input';
 interface Props {
   orderIdForItems: string | null;
   setOrderIdForItems: Dispatch<SetStateAction<string | null>>;
+  setObjectIdToDelete: (id: string) => void;  
+  refreshKey: string;
 }
 
-export function OrdersTable({ orderIdForItems, setOrderIdForItems }: Props) {
+export function OrdersTable({
+  orderIdForItems, setOrderIdForItems, setObjectIdToDelete, refreshKey
+}: Props) {
   const [choices, setChoices] = useState<OrderChoices | null>(null);
   const [orders, setOrders] = useState<OrderInfo[] | null>(null);
   const [loading, setLoading] = useState(true);
@@ -40,6 +44,10 @@ export function OrdersTable({ orderIdForItems, setOrderIdForItems }: Props) {
       fetchData();
     }
   }, [orderIdForItems, fetchData]);
+
+  useEffect(() => {
+    if (refreshKey === 'order') fetchData();
+  }, [refreshKey]);
 
   if (loading) return <h1>Загрузка...</h1>;
   if (!choices || !orders) return <h1>Произошла ошибка во время загрузки</h1>;
@@ -79,12 +87,9 @@ export function OrdersTable({ orderIdForItems, setOrderIdForItems }: Props) {
           {orders.map(orderInfo => (
             <tr key={orderInfo.id}>
               <td style={{ textAlign: 'center' }}>
-                <button type='button' onClick={
-                  async () => {
-                    await deleteObject(orderInfo.id, 'order');
-                    setOrders(await getObject<OrderInfo[]>('order'));
-                  }
-                }>
+                <button type='button' onClick={() => {
+                  setObjectIdToDelete(orderInfo.id)
+                }}>
                   &#128465;
                 </button>
               </td>

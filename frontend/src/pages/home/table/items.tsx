@@ -1,22 +1,25 @@
 import { useEffect, useState, type Dispatch, type SetStateAction } from 'react';
-import { addObject, deleteObject, getObject } from '../functions';
+import { addObject, getObject } from '../functions';
 import type { ItemInfo } from '../models';
 import { AutoPatchInput } from './common/auto-patch-input';
 
 interface Props {
   orderIdForItems: string | null;
   setOrderIdForItems: Dispatch<SetStateAction<string | null>>;
+  setObjectIdToDelete: (id: string) => void;
+  refreshKey: string;
 }
 
-export function ItemsTable({ orderIdForItems, setOrderIdForItems }: Props) {
+export function ItemsTable({
+  orderIdForItems, setOrderIdForItems, setObjectIdToDelete, refreshKey
+}: Props) {
   const [items, setItems] = useState<ItemInfo[] | null>(null);
   const [loading, setLoading] = useState(true);
-  const rowElems1: [keyof ItemInfo, string][] = [
+  const rowElems: [keyof ItemInfo, string][] = [
     ['name', 'text'],
     ['count', 'number'],
     ['price_by_one', 'number'],
   ]
-
   
   const fetchData = async () => {
     if (orderIdForItems) {
@@ -29,6 +32,10 @@ export function ItemsTable({ orderIdForItems, setOrderIdForItems }: Props) {
   useEffect(() => {
     fetchData();
   }, [orderIdForItems]);
+
+  useEffect(() => {
+    if (refreshKey === 'item') fetchData();
+  }, [refreshKey]);
 
   if (loading) return <h1>Загрузка...</h1>;
   if (!items) return <h1>Произошла ошибка во время загрузки</h1>;
@@ -68,22 +75,19 @@ export function ItemsTable({ orderIdForItems, setOrderIdForItems }: Props) {
           {items.map(itemInfo => (
             <tr key={itemInfo.id}>
               <td style={{ textAlign: 'center' }}>
-                <button type='button' onClick={
-                  async () => {
-                    await deleteObject(itemInfo.id, 'item');
-                    setItems(await getObject<ItemInfo[]>(`item/${orderIdForItems}`));
-                  }
-                }>
+                <button type='button' onClick={() => {
+                  setObjectIdToDelete(itemInfo.id);
+                }}>
                   &#128465;
                 </button>
               </td>
-              {rowElems1.map(elem => (
-                <td>
+              {rowElems.map(([field, type]) => (
+                <td key={field}>
                   <AutoPatchInput
                     object={itemInfo}
                     setObjects={setItems}
-                    field={elem[0]} 
-                    fieldType={elem[1]}
+                    field={field}
+                    fieldType={type}
                     url={'item'}
                   />
                 </td>
@@ -95,7 +99,7 @@ export function ItemsTable({ orderIdForItems, setOrderIdForItems }: Props) {
                 <AutoPatchInput
                   object={itemInfo}
                   setObjects={setItems}
-                  field={'return_count'} 
+                  field={'return_count'}
                   fieldType={'number'}
                   url={'item'}
                 />
@@ -110,7 +114,7 @@ export function ItemsTable({ orderIdForItems, setOrderIdForItems }: Props) {
                 <AutoPatchInput
                   object={itemInfo}
                   setObjects={setItems}
-                  field={'return_date'} 
+                  field={'return_date'}
                   fieldType={'date'}
                   url={'item'}
                 />

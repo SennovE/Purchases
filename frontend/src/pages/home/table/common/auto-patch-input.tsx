@@ -1,5 +1,5 @@
-import type { Dispatch, SetStateAction } from "react";
-import { patchObject } from "../../functions";
+import type { Dispatch, SetStateAction } from 'react';
+import { patchObject } from '../../functions';
 
 interface Props<T extends { id: string }, K extends Extract<keyof T, string>> {
   object: T & Record<K, number | string | boolean | null>;

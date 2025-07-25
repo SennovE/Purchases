@@ -97,14 +97,14 @@ export function DropoutListInput({ id, field, fieldValue, patchUrl, list, listSe
         const opt = addToChoices(label);
         void applyValue(opt);
       }}
-      placeholder="Выберите или добавьте…"
+      placeholder='Выберите или добавьте…'
       isClearable={false}
       components={{
         DropdownIndicator: () => null,
         IndicatorSeparator: () => null
       }}
       menuPortalTarget={typeof document !== 'undefined' ? document.body : null}
-      menuPosition="fixed"
+      menuPosition='fixed'
     />
   );
 }
